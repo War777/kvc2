@@ -1,0 +1,190 @@
+/*
+| Hoja de Estilos, independientes de Bootstrap o Bootstrap-theme
+*/
+
+/*
+* Este estilo funciona para probar la resolucion combinado 
+* con el cambio de background en los media queries
+*/
+
+/*.screen{
+	height: 10px;
+	width: 10px;
+}*/
+
+/*
+*Transparencia para probar diferentes layouts sobre puestos
+*/
+.bg {
+	background: rgba(0, 0, 0, 0.1);
+}
+
+.edit {
+    visibility: hidden; 
+}
+.edit:hover {
+    visibility: visible; 
+    background: rgba(0, 0, 0, 0.5); 
+}
+
+/* Estilos usados por los componentes del JFU*/
+.jfuProgress{
+    opacity: 0;
+    display: none;
+    transition: all 1s ease;
+}
+
+#contenedorArchivo{
+
+    opacity: 0;
+    transition: all 1s ease;
+}
+
+#contenedorAgregar{
+    /*opacity: 0;*/
+    display: inline;
+    transition: all 1s ease;
+}
+/*=========================================================*/
+
+/*
+* Estilos para la edicion del layout
+*/
+
+canvas {
+        border: 1px #000 solid;
+}
+
+.location{
+    height: 10px;
+    width: 20px;
+    border: 1px #000 solid;
+}
+
+.layout{
+    border: 1px #000 solid; 
+    height: 800px;
+    width: 100%;
+}
+
+.area {
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.area > tr, td {
+    border: 1px solid black;
+}
+
+ tr {
+    height: 5px;
+}
+
+td {
+    min-width: 10px;
+}
+
+.ui-resizable-helper { border: 1px solid #e0e0e0; }
+
+
+/*
+*==========================================================
+*/
+
+
+/*--------------------------
+* Estilos para el Submenu
+--------------------------*/
+.dropdown-submenu {
+    position: relative;
+}
+
+.dropdown-submenu>.dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -6px;
+    margin-left: -1px;
+    -webkit-border-radius: 0 6px 6px 6px;
+    -moz-border-radius: 0 6px 6px;
+    border-radius: 0 6px 6px 6px;
+}
+
+.dropdown-submenu:hover>.dropdown-menu {
+    display: block;
+}
+
+.dropdown-submenu>a:after {
+    display: block;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-right: -10px;
+}
+
+.dropdown-submenu:hover>a:after {
+    border-left-color: #fff;
+}
+
+.dropdown-submenu.pull-left {
+    float: none;
+}
+
+.dropdown-submenu.pull-left>.dropdown-menu {
+    left: -100%;
+    margin-left: 10px;
+    -webkit-border-radius: 6px 0 6px 6px;
+    -moz-border-radius: 6px 0 6px 6px;
+    border-radius: 6px 0 6px 6px;
+}
+
+/*--------------------------
+--------------------------*/
+
+.panel-collapse > li {
+    list-style-type: none;
+    line-height: 25px;
+}
+
+.panel-collapse > li > a{
+    font-size: 12px;
+}
+
+/*
+* Media queries para ajustar los estilos a diferentes resoluciones 
+*/
+
+@media screen and (min-width: 1200px) {
+	.screen{
+        content: "vp1200min";
+    }
+}
+
+@media screen and (max-width: 1200px) {
+	.screen{
+        content: "vp1200max";
+    }
+}
+
+@media screen and (max-width: 980px) {
+	.screen{
+        content: "vp980max";
+    }
+}
+
+@media screen and (max-width: 650px) {
+	.screen{
+        content: "vp650max";
+    }
+}
+
+@media screen and (max-width: 480px) {
+	.screen{
+        content: "vp480max";
+    }
+}
