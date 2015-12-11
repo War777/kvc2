@@ -34,6 +34,14 @@
 				LIMIT 20;"
 			);
 
+			$lastUpdate = Own::queryToSingleArray(
+				"SELECT usu, dat
+				FROM kvm_eve
+				WHERE tab = 'sto_vir_loc'
+				ORDER BY dat DESC
+				LIMIT 1;"
+			);
+
 			$data = array(
 				'records' => $records
 			);

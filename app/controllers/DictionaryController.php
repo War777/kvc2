@@ -101,8 +101,100 @@
 
 			return View::make('virtualLocations')->with('data', $data);
 
-		}	
+		}
 
+		//Funcion para extraer el select
+		public function getForeignSelect($ft, $fk, $fd){
+
+			$records = Own::queryToArray(
+
+				"SELECT $fk as 'fk', $fd as 'fd'
+				FROM $ft;"
+
+			);
+
+			return $records;
+
+		}
+
+
+		//Funcion para actualizar un diccionario
+		public function updateDictionary($tableName, $inputs){
+
+			$update = "UPDATE " . $tableName;
+
+			$where = ' WHERE ';
+
+			$values = ' SET ';
+
+			$firstSet = true;
+
+			foreach ($inputs as $input) {
+
+				if($input['type'] == 'pk'){
+
+					$where .= $input['field'] . " = " . $input['value'];
+
+				} else if($input['type'] == 'field'){
+
+					if($firstSet == true){
+						
+						$values .= $input['field'] . " = " . $input['value'];
+
+					} else {
+
+						$values .= ", " .  $input['field'] . " = " . $input['value'];
+
+						$firstSet = false;
+
+					}
+
+				}
+				
+			}
+
+			$query = $update . $where . $values;
+
+			return $query;
+
+		}
+
+		//Funcion para extraer las categorias
+		public function showCategories(){
+
+			$records = Own::queryToArray('select * from sto_cat;');
+			
+
+			$data = array(
+
+				'records' => $records
+
+			);
+
+			return View::make('categories')->with('data', $data);
+
+		}
+
+		//Funcion que devuelte las ubicaciones faltantes
+		public function showMissingLocations(){
+
+			$records = Own::queryToArray(
+				"SELECT 
+				    ubi, are
+				FROM
+				    sto_cap
+				WHERE
+				    con = 1 AND cap = 0 and vir = 0
+				group by ubi;"
+			);
+
+			$data = array(
+				'records' => $records
+			);
+
+			return View::make('missingLocations')->with('data', $data);
+
+		}
 
 	}
 

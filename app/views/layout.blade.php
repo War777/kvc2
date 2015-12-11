@@ -25,7 +25,7 @@
 
 	{{-- Inicio del modal para el estado de carga --}}
 
-	<div class="modal fade" id="modalLoadingState" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal fade" id="modalLoadingState" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static">
 		
 		<div class="modal-dialog" role="document">
 			
@@ -71,7 +71,7 @@
 
 							<!-- <button type="button" class="btn btn-primary" id="update">Save changes</button> -->
 
-							<button type="button" class="btn btn-success" data-dismiss="modal">
+							<button id="acceptModal" type="button" class="btn btn-success" data-dismiss="modal">
 								<i class="glyphicon glyphicon-ok"></i>
 								Aceptar
 							</button>
@@ -244,6 +244,7 @@
                     	<li><a href="areas">Areas</a></li>
                         <li><a href="locations">Ubicaciones</a></li>
                         <li><a href="stowages"> Estibas y Estandares </a></li>
+                        <li><a href="categories"> Categorias </a></li>
                         <li><a href="virtualAreas">Areas virtuales</a></li>
                         <li><a href="virtualLocations"> Ubicaciones virtuales </a></li>
                     </ul>
@@ -263,11 +264,32 @@
                 </li>
 
                 <li>
-                    <a href="caoticStowages">Ubicaciones caoticas</a>
+                	<a data-toggle="collapse" data-parent="#menu-bar" aria-expanded="true" href="#settings">
+                        Ajustes
+                    </a>
+
+                    <ul id="settings" class="panel-collapse collapse">
+                    	<li><a href="emailRanges">Rangos de email</a></li>
+                    </ul>
+
                 </li>
 
                 <li>
                     <a href="queries">Consultas</a>
+                </li>
+
+                <li>
+                	
+                	<a data-toggle="collapse" data-parent="#menu-bar" aria-expanded="true" href="#utilities">
+                        Utilidades
+                    </a>
+
+                    <ul id="utilities" class="panel-collapse collapse">
+                    	<li><a href="missingLocations">Ubicaciones faltantes</a></li>
+                    	<li><a href="caoticStowages">Revision de estibas</a></li>
+                    	<li><a href="customQueries"> Queries personalizados </a></li>
+                    </ul>
+
                 </li>
 
                 <!-- <li>

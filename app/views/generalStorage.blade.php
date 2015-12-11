@@ -9,16 +9,72 @@
 @stop
 
 @section('content')
+	
+	<br>
 
 	<div class="row">
-		<div class="col-md-12 text-right">
 
-			<button type="button" class="btn btn-info btn-lg runAjaxController" controller="StorageController@runStorageCapacity">
+		<div class="col-md-12">
+
+			<table class="table table-bordered table-condensed">
+				
+				<thead class="bg-info" align="center">
+					<td>Capacidad</td>
+					<td>Actual</td>
+					<td>Optimizada</td>
+				</thead>
+
+				<tbody>
+
+					<tr>
+						<td>Ubicaciones disponibles:</td>
+						<td class="text-right">
+							
+							{{ $data['totalPreEmptyLocations'] }}
+
+						</td>
+						<td class="text-right">
+							{{ $data['totalPostEmptyLocations'] }}
+						</td>
+					</tr>
+					
+					<tr>
+						<td>PAPs disponibles:</td>
+						<td class="text-right">
+							
+							{{ $data['totalPreEmptyPaps'] }}
+
+						</td>
+						<td class="text-right">
+							{{ $data['totalPostEmptyPaps'] }}
+						</td>
+					</tr>
+
+					<tr>
+						<td>Unidades disponibles:</td>
+						<td class="text-right">
+							
+							{{ ceil($data['totalPreEmptyPaps'] / 28) }}
+
+						</td>
+						<td class="text-right">
+							{{ ceil($data['totalPostEmptyPaps'] / 28) }}
+						</td>
+					</tr>
+
+				</tbody>
+			</table>
+
+			<br>
+
+			<button type="button" class="btn btn-info btn-xs runAjaxController pull-right" controller="StorageController@runStorageCapacity">
 				<i class="glyphicon glyphicon-refresh"></i>
 				Actualizar
 			</button>
 					
 		</div>
+
+
 	</div>
 
 	@if($data['warehouses'])
@@ -100,7 +156,7 @@
 								</td>
 							</tr> -->
 							
-							<<!-- tr>
+							<!-- tr>
 								<td>Capacidad de la existencia</td>
 								<td class="text-center">
 									{{ $category['caoticCapacity'] + $category['preCapacity'] }}

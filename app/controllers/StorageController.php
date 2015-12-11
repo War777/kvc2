@@ -10,16 +10,16 @@
 
 			$start = Own::getCurrentTime();
 
-			$truncateQueries = array(
-				'Truncado de tabla de ubicaciones caoticas' => 'truncate table sto_cao;',
-				'Truncado de tabla de ubicaciones consolidadas' => 'truncate table sto_con;',
-				'Truncado de tabla de ubicaciones vacias' => 'truncate table sto_emp;',
-				'Truncado de tabla de ubicaciones filtradas' => 'truncate table sto_fil_loc;',
-				'Truncado de tabla de ubicaciones de origen' => 'truncate table sto_fro;',
-				'Truncado de tabla de ubicaciones de destino' => 'truncate table sto_to;'
-			);
+			// $truncateQueries = array(
+			// 	'Truncado de tabla de ubicaciones caoticas' => 'truncate table sto_cao;',
+			// 	'Truncado de tabla de ubicaciones consolidadas' => 'truncate table sto_con;',
+			// 	'Truncado de tabla de ubicaciones vacias' => 'truncate table sto_emp;',
+			// 	'Truncado de tabla de ubicaciones filtradas' => 'truncate table sto_fil_loc;',
+			// 	'Truncado de tabla de ubicaciones de origen' => 'truncate table sto_fro;',
+			// 	'Truncado de tabla de ubicaciones de destino' => 'truncate table sto_to;'
+			// );
 
-			Own::runQueries($truncateQueries);
+			// Own::runQueries($truncateQueries);
 
 			$queries = array();
 
@@ -206,10 +206,12 @@
 			$queries['Praparado de repositorio'] = "truncate sto_cap;";
 
 			$queries['Consolidado de tabla temporal a repositorio de capacidad de almacenaje'] = "INSERT into sto_cap(
-								select * from sto_cap_tem
-							);";
+				select * from sto_cap_tem
+			);";
 
 			$this->consolidateLpnStorage();
+
+			$this->sendEmails();
 			
 			$results = Own::runQueries($queries);
 
@@ -218,7 +220,7 @@
 			$runTime = Own::getRunTime($start, $finish);
 
 			$response = array(
-				'responseText' => '¡Hecho!<br>Tiempo de respuesta: ' . $runTime
+				'responseText' => '<b>Tiempo de ejecucion:</b> ' . $runTime
 			);
 
 			return  $response;
@@ -792,6 +794,8 @@
 
 		private function consolidateCategory(&$category){
 
+			// echo "<table>";
+
 			foreach ($category['pivots'] as &$pivot) {
 
 				$locationsCounter = count($pivot['locations']);
@@ -832,13 +836,6 @@
 							array_push($pivot['locations'][$i]['from'], $fromPallets);
 							array_push($pivot['locations'][$j]['to'], $toPallets);
 
-							// if($pivot['locations'][$i]['location'] == '15-05'){
-
-							// 	Own::d($pivot['locations'][$i]);
-							// 	Own::d($pivot['locations'][$j]);
-
-							// }
-
 						}
 						
 					}
@@ -846,6 +843,8 @@
 				}
 
 			}
+
+			// echo "</table>";
 
 		}
 
@@ -904,6 +903,8 @@
 
 			$category['postAvailablePallets'] = 0;
 
+			// echo "<table>";
+
 			foreach ($category['pivots'] as &$pivot) {
 
 				foreach ($pivot['locations'] as $location) {
@@ -911,7 +912,7 @@
 					$location['sku'] = $pivot['sku'];
 					$location['fecCad'] = $pivot['fecCad'];
 
-					if($location['finalPapsUsed'] <= 0){
+					if($location['finalPapsUsed'] == 0){
 
 						$emptyLocationFound = false;
 						
@@ -945,6 +946,14 @@
 
 							array_push($category['postEmptyLocations'], $location);
 
+							
+
+							foreach ($location['to'] as $to) {
+								// echo "<tr> <td> " . $location['location'] . " </td> <td> " . $to['idLoc'] . " </td> <td> " . $to['lpn'] . " </td> </tr>";
+							}
+
+
+
 						}
 
 					} else {
@@ -956,6 +965,27 @@
 				}
 
 			}
+
+			// echo "</table>";
+
+
+			// if($category['id'] == 1 && $category['idCed'] == 4252){
+
+			// 	foreach ($category['postEmptyLocations'] as $location) {
+			// 		echo "<br>" . $location['location'];
+
+			// 		foreach ($location['to'] as $to) {
+			// 			echo "<br>---" .  $to['idLoc'] . " -> " . $to['lpn'];
+			// 		}
+			// 	}
+
+			// }
+
+			// if($category['id'] == 1 && $category['idCed'] == 4252){
+
+			// 	Own::d($category);
+
+			// }
 
 			foreach ($category['preEmptyLocations'] as $preEmpLocation) {
 
@@ -1219,6 +1249,8 @@
 			}
 
 			if(count($toRecords) > 0){
+
+				// echo Own::arrayToTable($toRecords);
 				
 				DB::table('sto_to')->insert($toRecords);
 
@@ -1239,6 +1271,12 @@
 
 			//Seleccionamos los cedis para los checkboxes
 			$warehouses = Own::stdRecordsToArray(DB::select('select idCed, ced from sto_cap where con = 1 group by idCed, ced;'));
+
+			$totalPreEmptyPaps = 0;
+			$totalPostEmptyPaps = 0;
+
+			$totalPreEmptyLocations = 0;
+			$totalPostEmptyLocations = 0;
 
 			foreach ($warehouses as &$warehouse) {
 
@@ -1319,6 +1357,12 @@
 															->where('idCat', '=', $category['idCat'])
 															->sum('cap');
 
+					$totalPreEmptyPaps += $category['preEmptyPaps'];
+					$totalPostEmptyPaps += $category['postEmptyPaps'];
+
+					$totalPreEmptyLocations += $category['preEmptyLocations'];
+					$totalPostEmptyLocations += $category['postEmptyLocations'];
+
 					$category['preCapacities'] = Own::queryToArray(
 						"select
 
@@ -1353,7 +1397,12 @@
 			}
 
 			$data = array(
-				'warehouses' => $warehouses
+				'warehouses' => $warehouses,
+				'totalPreEmptyPaps' => $totalPreEmptyPaps,
+				'totalPostEmptyPaps' => $totalPostEmptyPaps,
+				'totalPreEmptyLocations' => $totalPreEmptyLocations,
+				'totalPostEmptyLocations' => $totalPostEmptyLocations
+
 			);
 
 			//Generamos la vista
@@ -1589,6 +1638,34 @@
 
 		public function showTasks($idCed, $idCat){
 
+			$queries = array();
+
+			$queries['Depurado de tabla 1'] = "drop table if exists sto_to_tem;";
+			
+			$queries['Depurado de tabla 2'] = "drop table if exists sto_to_mov;";
+			
+			$queries['Creacion de tabla 1'] = "create temporary table sto_to_tem
+				select idLoc, idToLoc, lpn, 0 as 'mov'
+				from sto_to
+				where idCed = " . $idCed . "
+				and idCat = " . $idCat . "
+				group by idLoc, idToLoc
+				order by idLoc, lpn;";
+			
+			$queries['Creacion de tabla 2'] = "create temporary table sto_to_mov
+				select idLoc, count(idToLoc) as 'mov'
+				from sto_to
+				where idCed = " . $idCed . "
+				and idCat = " . $idCat . "
+				group by idLoc;";
+			
+			$queries['Match entre ambas tablas'] = "update sto_to_tem
+				inner join sto_to_mov
+				on sto_to_tem.idLoc = sto_to_mov.idLoc
+				set sto_to_tem.mov = sto_to_mov.mov;";
+
+			Own::runQueries($queries);
+
 			$query = "select idLoc, idFroLoc, lpn
 					from sto_fro
 					where idCed = " . $idCed . "
@@ -1598,10 +1675,8 @@
 			$fromRecords = Own::queryToArray($query);
 
 			$query = "select idLoc, idToLoc, lpn
-					from sto_to
-					where idCed = " . $idCed . "
-					and idCat = " . $idCat . "
-					order by idLoc, lpn;";
+				from sto_to_tem
+				order by mov, idLoc, lpn;";
 
 			$toRecords = Own::queryToArray($query);
 
@@ -1611,6 +1686,68 @@
 			);
 
 			return View::make('tasks')->with('data', $data);
+
+		}
+
+		public function sendEmails(){
+
+			$preEmptyPaps = DB::table('sto_emp')
+							->where('pre', '=', 1)
+							->sum('cap');
+
+			$postEmptyPaps = DB::table('sto_emp')
+							->sum('cap');
+
+			$preAvailableUnits = ceil($preEmptyPaps / 28);
+			$postAvailableUnits = ceil($postEmptyPaps / 28);
+
+			$records = Own::queryToArray(
+				"select users.email as 'email', sto_ema.res as 'res'
+				from users
+				inner join sto_ema
+				on users.id = sto_ema.id;"
+			);
+			
+			//Linea de filtro
+			// and sto_ema.lim >= " . $preAvailableUnits . ";"
+
+			$destinataries = array();
+			$copies = array();
+
+			foreach ($records as $record) {
+
+				if($record['res'] == 1){
+
+					array_push($destinataries, $record['email']);
+
+				} else {
+
+					array_push($copies, $record['email']);
+
+				}
+
+			}
+
+			$data = array(
+				'user' => 'war',
+				'email' => 'oscar.resendiz@kellogg.com'
+			);
+
+			Mail::send(
+				'storageMail', 
+				array(
+					'preAvailableUnits' => $preAvailableUnits,
+					'postAvailableUnits' => $postAvailableUnits,
+				), 
+				function($message) 
+				use ($destinataries, $copies){
+			        $message
+			        	->to($destinataries)
+			        	->cc($copies)
+			        	->subject('Capacidad de almacenaje');
+		    	}
+		    );
+
 
 		}
 

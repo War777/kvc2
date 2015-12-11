@@ -20,7 +20,7 @@
 }
 
 .edit {
-    visibility: hidden; 
+    /*visibility: hidden; */
 }
 .edit:hover {
     visibility: visible; 

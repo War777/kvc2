@@ -229,6 +229,7 @@ $(document).ready(function(){
 				$.ajax({
 					url: 'loadCsv',
 					method: 'POST',
+					dataType: 'json',
 					data:{
 
 						'table' : $('#table').val(),
@@ -251,9 +252,8 @@ $(document).ready(function(){
 
 					},
 					success: function(respuesta){
-						l('success');
 						l(respuesta);
-						$('#retro').html(respuesta);
+						$('#retro').html(respuesta.responseText);
 						
 					},
 					error: function(respuesta){

@@ -16,6 +16,24 @@
 			<br>Usuario: {{ $data['lastUpdate']['usu'] }} 
 	</p>
 
+	<button
+		type="button"
+		class="activarModal btn btn-info btn-xs"
+		table="sto_vir_loc"
+		periodExists = "false"
+		requiredFile="Diccionario de ubicaciones virtuales"
+		post=""
+	>
+		<i class="glyphicon glyphicon-refresh"></i>
+		Actualizar
+	</button>
+
+	<br>
+
+	<br>
+
+	
+
 	<legend>Detalle</legend>
 
 	@if($data['records'])
@@ -32,7 +50,7 @@
 				<tr>
 					
 					<td>{{ $record['virLoc'] }}</td>
-					<td>{{ $record['fisLoc'] }}</td>
+					<td>'{{ $record['fisLoc'] }}</td>
 
 				</tr>
 

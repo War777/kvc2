@@ -109,21 +109,23 @@ $(document).ready(function(){
 	    		success: function(response){
 
 	    			loadingState(false, response.responseText);
-	    			l(response);
+	    			l(response.responseText);
 
 
 	    		}, 
 
 	    		error: function(response){
 	    			loadingState(false, response.responseText);
+	    			alert('Error:' + response.responseText);
+	    			l(response);
 	    		}, 
 
-	    		complete: function(response){
+	    		// complete: function(response){
 
-	    			// loadingState(false, response.responseText);
-	    			// l(response);
+	    		// 	loadingState(false, response.responseText);
+	    		// 	l(response);
 
-	    		}
+	    		// }
 
 	    	});
 
@@ -189,6 +191,10 @@ $(document).ready(function(){
 			}
 		});		
     	
+    });
+
+    $('#acceptModal').click(function(){
+    	location.reload();
     });
 
 

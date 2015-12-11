@@ -20,15 +20,15 @@
 
 			<form action="queries" method="post">
 				
-				<input type="radio" name="queryField" value="lpn"> Lpn
+				<input type="radio" name="queryField" value="are" checked="true"> Area
+				<br>
+				<input type="radio" name="queryField" value="ubi"> Ubicacion
 				<br>
 				<input type="radio" name="queryField" value="sku"> Sku
 				<br>
 				<input type="radio" name="queryField" value="lot"> Lote
 				<br>
-				<input type="radio" name="queryField" value="are"> Area
-				<br>
-				<input type="radio" name="queryField" value="ubi"> Ubicacion
+				<input type="radio" name="queryField" value="lpn"> Lpn
 
 				<br>
 				<br>

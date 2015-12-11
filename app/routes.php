@@ -32,6 +32,133 @@ Route::group(
 				Route::get('profile', 'UsersController@showProfile');
 			//======
 
+			//Agregar usuario
+				Route::post('addUser', function(){
+
+					if(Request::ajax()){
+
+						$inputs = Input::get('data');
+
+						return json_encode(
+							Own::runStringController(
+								'UsersController@addUser', 
+								$parameters = array(
+									$id = Input::get('id'),
+									$user = Input::get('user'),
+									$password = Input::get('password'),
+									$email = Input::get('email')
+								)
+							)
+						);
+
+					}
+					
+
+				});
+
+			//======
+
+			//Agregar usuario
+			Route::post('updateUser', function(){
+
+				if(Request::ajax()){
+
+					return json_encode(
+						Own::runStringController(
+							'UsersController@updateUser', 
+							$parameters = array(
+								$id = Input::get('id'),
+								$user = Input::get('user'),
+								$password = Input::get('password'),
+								$email = Input::get('email')
+							)
+						)
+					);
+
+				}
+				
+
+			});
+
+			//======
+
+			//Agregar un query personalizado
+
+			Route::get('customQueries', function(){
+
+				$records = Own::queryToArray('select * from sto_que;');
+
+				$data = array(
+					'records' => $records
+				);
+
+				return View::make('customQueries')->with('data', $data);
+
+			});
+
+			//======
+
+			Route::post('customQueries', function(){
+
+				$description = Input::get('description');
+				$query = Input::get('query');
+
+				$test = 1;
+
+				$message = '';
+
+				if(
+
+					Own::contains($query, 'delete', false) ||
+					Own::contains($query, 'update', false) ||
+					Own::contains($query, 'drop', false) ||
+					Own::contains($query, 'create', false)
+
+				){
+
+					$test = 0;
+					$message = 'Instruccion no permitida';
+
+				} else {
+
+					try {
+					    
+						$response = Own::queryToArray($query);
+
+						DB::table('sto_que')->insert(
+							array(
+								'des' => $description,
+								'que' => $query
+							)
+ 						);
+
+ 						$message = 'Query agregado con exito';
+
+					} catch (Exception $e) {
+					    
+					    $test = 0;
+						$message = 'Formato de query no valido';
+
+					}
+
+				}
+
+				$records = Own::queryToArray('select * from sto_que;');
+
+				$data = array(
+					'test' => $test,
+					'message' => $message,
+					'records' => $records,
+					'description' => $description,
+					'query' => $query
+				);
+
+				return View::make('customQueries')->with('data', $data);
+
+			});
+
+
+
 		/*
 		* ==========================================================================
 		*/
@@ -40,9 +167,7 @@ Route::group(
 		Route::get('logout', 'AuthController@logOut');
 
 		//Ruta default
-		Route::get('/', function(){
-			return View::make('start');
-		});
+		Route::get('/', 'StorageController@generalStorage');
 
 		//Ruta a la seccion de inicio
 		// Route::get('home', function(){
@@ -63,6 +188,10 @@ Route::group(
 
 		Route::get('virtualLocations', 'DictionaryController@showVirtualLocations');
 
+		Route::get('categories', 'DictionaryController@showCategories');
+
+		Route::get('missingLocations', 'DictionaryController@showMissingLocations');
+
 
 		/*
 		* Rutas relacionadas a la actualizacion de repositorios
@@ -76,7 +205,95 @@ Route::group(
 				//Repositorio de existencias en materia prima
 				Route::get('stockMp', 'RepositoriesController@showStockMp');
 
+				//Mostrar los rangos de email
+				Route::get('emailRanges', 'SettingsController@showEmailRanges');
+
+				//Agregar un rango de email
+				Route::post('addRange', function(){
+
+					if(Request::ajax()){
+
+						return json_encode(
+							Own::runStringController(
+								'SettingsController@addRange', 
+								$parameters = array(
+									$id = Input::get('id'),
+									$res = Input::get('res'),
+									$lim = Input::get('lim')
+								)
+							)
+						);
+
+					}
+					
+
+				});
+
+				//Actualizar un rango de email
+				Route::post('updateRange', function(){
+
+					if(Request::ajax()){
+
+						return json_encode(
+							Own::runStringController(
+								'SettingsController@updateRange', 
+								$parameters = array(
+									$id = Input::get('id'),
+									$res = Input::get('res'),
+									$lim = Input::get('lim')
+								)
+							)
+						);
+
+					}
+					
+
+				});
+
 			// ==========
+
+			//Obtener el combo de la base de datos
+
+			Route::post('getForeignSelect', function(){
+
+				if(Request::ajax()){
+
+					return json_encode(
+						Own::runStringController(
+							'DictionaryController@getForeignSelect', 
+							$parameters = array(
+								$ft = Input::get('ft'),
+								$fk = Input::get('fk'),
+								$fd = Input::get('fd')
+							)
+						)
+					);
+
+				}
+				
+			});
+
+			//==========
+
+			//Actualizar un diccionario
+			Route::post('updateDictionary', function(){
+
+				if(Request::ajax()){
+
+					return json_encode(
+						Own::runStringController(
+							'DictionaryController@updateDictionary', 
+							$parameters = array(
+								'tableName' => Input::get('tableName'),
+								'inputs' => Input::get('inputs')
+							)
+						)
+					);
+
+				}
+				
+			});
+			//==========
 
 
 		/*
@@ -94,7 +311,7 @@ Route::group(
 
 				$periodExists = Input::get('periodExists');
 
-				$response = Own::loadCsvToDb($table, $file, $periodExists);
+				$result = Own::loadCsvToDb($table, $file, $periodExists);
 
 				if(Input::get('post') != ''){
 
@@ -104,11 +321,15 @@ Route::group(
 
 					$controller = $app->make($controllerData[0]);
 
-					return $controller->callAction($controllerData[1], $parameters = array());
+					$controller->callAction($controllerData[1], $parameters = array());
 
 				}
 
-				Own::d($response);
+				$response = array(
+					'responseText' => '<b>Registros agregados:</b> ' . number_format($result['insertedRows'], 0)
+				);
+
+				return json_encode($response);
 
 			}
 
@@ -121,9 +342,16 @@ Route::group(
 
 				$controller = Input::get('controller');
 
-				$response = Own::runStringController($controller, $parameters = array());
+				$result = Own::runStringController($controller, $parameters = array());
+
+				$response = array(
+					'responseText' => $result['responseText']
+				);
+
+				// Own::d($response);
 
 				return json_encode($response);
+				// return $response;
 
 			}
 
@@ -139,6 +367,8 @@ Route::group(
 		Route::get('consolidateLpnStorage', 'StorageController@consolidateLpnStorage');
 
 		Route::get('runStorageCapacity', 'StorageController@runStorageCapacity');
+
+		Route::get('sendMails', 'StorageController@sendEmails');
 
 		Route::get('queries', function(){
 
